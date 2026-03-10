@@ -11,16 +11,38 @@ def tirar_dados():
     dado3= random.randint(1,6)
     dado4= random.randint(1,6)
     dado5= random.randint(1,6)
-    tirar_again='V'
     lista_dados=[dado1, dado2, dado3, dado4, dado5]
     print (f'Dado 0: {lista_dados[0]}, Dado 1: {lista_dados[1]}, Dado 2: {lista_dados[2]}, Dado 3: {lista_dados[3]}, Dado 4: {lista_dados[4]}')
-    
-    tirar_again=input ('Desea tirar los dados de nuevo? (V o F): ')
+    valido=False
+    while not valido:
+        tirar_again=input ('Desea tirar los dados de nuevo? (V o F): ')
+        if tirar_again=='V' or tirar_again=='F':
+            valido=True
+        else: 
+            print('ingrese V o F')
     while tirada_counter<3 and tirar_again=='V':
-        intentos=int(input('Cuantos dados quiere volver a tirar?: '))
+        valido=False
+        while not valido:
+            try:
+                intentos=int(input('Cuantos dados quiere volver a tirar?: ')) 
+                if intentos<=5:
+                    valido=True
+                else:
+                    print('ingrese un numero valido')
+            except:
+                print('ingrese un numero valido') 
         i=1
         while i<=intentos:
-            dado_a_tirar=int(input ('Cual dado quiere volver a tirar?: ')) #Recordar 2 try except y reconocer V y F en minus
+            valido=False
+            while not valido:
+                try:
+                    dado_a_tirar=int(input ('Cual dado quiere volver a tirar?: ')) 
+                    if dado_a_tirar==0 or dado_a_tirar==1 or dado_a_tirar==2 or dado_a_tirar==3 or dado_a_tirar==4:
+                        valido=True
+                    else:
+                        print('ingrese un numero valido')
+                except:
+                    print('ingrese un numero valido') 
             lista_dados[dado_a_tirar]=tirar1dado()
             i+=1
         print (f'Dado 0: {lista_dados[0]}, Dado 1: {lista_dados[1]}, Dado 2: {lista_dados[2]}, Dado 3: {lista_dados[3]}, Dado 4: {lista_dados[4]}')
@@ -30,8 +52,10 @@ def tirar_dados():
     return (lista_dados)
 
 def categorias (lista_dados):
+    lista_puntajes=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     sorted(lista_dados)             
     lista_categorias=['E', 'F', 'P', 'G', '1', '2', '3', '4', '5', '6']
+    print(lista_categorias)
     cat_elegida=input('Que categoría elige para sus dados?: ')
     
     while cat_elegida not in lista_categorias:
@@ -47,6 +71,7 @@ def categorias (lista_dados):
             print ('Sus dados no califican para entrar a ESCALERA.')
         else:
             puntaje_escalera+=20
+            lista_puntajes[0]=puntaje_escalera
     
     if cat_elegida=='F':
         puntaje_full=0
@@ -57,6 +82,7 @@ def categorias (lista_dados):
             print ('Sus dados no califican para entrar a FULL.')
         else:
             puntaje_full+=30
+            lista_puntajes[1]=puntaje_full
 
     if cat_elegida=='P':
         puntaje_poker=0
@@ -67,6 +93,7 @@ def categorias (lista_dados):
             print ('Sus dados no califican para entrar a POKER.')
         else:
             puntaje_poker+=40
+            lista_puntajes[2]=puntaje_poker
     
     if cat_elegida=='G':
         puntaje_generala=0
@@ -77,6 +104,7 @@ def categorias (lista_dados):
             print ('Sus dados no califican para entrar a GENERALA.')
         else:
             puntaje_generala+=50
+            lista_puntajes[3]=puntaje_generala
     
     if cat_elegida=='6':
         puntaje_seis=0
@@ -84,14 +112,81 @@ def categorias (lista_dados):
         for elem in lista_dados:
             if elem==6:
                 puntaje_seis+=elem
-                
-        
-        if not (lista_dados[0]==lista_dados[1]==lista_dados[2]==lista_dados[3]==lista_dados[4]):
-            is_generala=False
-        if not is_seis:
-            print ('Sus dados no califican para entrar a GENERALA.')
-        else:
-            puntaje_generala+=50
+        if puntaje_seis==0:
+            print ('Sus dados no califican para entrar a SEIS.')
+            is_seis=False
+        if is_seis:
+            lista_puntajes[9]=puntaje_seis
+
+    if cat_elegida=='5':
+        puntaje_cinco=0
+        is_cinco=True
+        for elem in lista_dados:
+            if elem==5:
+                puntaje_cinco+=elem
+        if puntaje_cinco==0:
+            print ('Sus dados no califican para entrar a CINCO.')
+            is_cinco=False
+        if is_cinco:
+            lista_puntajes[8]=puntaje_cinco
+    
+    if cat_elegida=='4':
+        puntaje_cuatro=0
+        is_cuatro=True
+        for elem in lista_dados:
+            if elem==4:
+                puntaje_cuatro+=elem
+        if puntaje_cuatro==0:
+            print ('Sus dados no califican para entrar a CUATRO.')
+            is_cuatro=False
+        if is_cuatro:
+            lista_puntajes[7]=puntaje_cuatro
+
+    if cat_elegida=='3':
+        puntaje_tres=0
+        is_tres=True
+        for elem in lista_dados:
+            if elem==3:
+                puntaje_tres+=elem
+        if puntaje_tres==0:
+            print ('Sus dados no califican para entrar a TRES.')
+            is_tres=False
+        if is_tres:
+            lista_puntajes[6]=puntaje_tres
+
+    if cat_elegida=='2':
+        puntaje_dos=0
+        is_dos=True
+        for elem in lista_dados:
+            if elem==2:
+                puntaje_dos+=elem
+        if puntaje_dos==0:
+            print ('Sus dados no califican para entrar a DOS.')
+            is_dos=False
+        if is_dos:
+            lista_puntajes[5]=puntaje_dos
+    
+    if cat_elegida=='1':
+        puntaje_uno=0
+        is_uno=True
+        for elem in lista_dados:
+            if elem==1:
+                puntaje_uno+=elem
+        if puntaje_uno==0:
+            print ('Sus dados no califican para entrar a UNO.')
+            is_uno=False
+        if is_uno:
+            lista_puntajes[4]=puntaje_uno
+            
+    
+    
+def escribir_csv(lista):  
+    with open('jugadas.csv', 'a', newline='', encoding='utf-8') as archivo:
+        escritor = csv.writer(archivo)
+        escritor.writerow(lista)
+    
+
+
     
 
 
