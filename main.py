@@ -1,202 +1,399 @@
 import random
+import csv
 
-def tirar1dado ():
-    dado=random.randint(1,6)
-    return dado
+
+def guardar_tabla_csv(lista_puntaje):
+    categorias_csv = ['E', 'F', 'P', 'G', '1', '2', '3', '4', '5', '6']
+
+    with open("jugadas.csv", "w", newline="") as archivo:
+        writer = csv.writer(archivo)
+        writer.writerow(["jugada", "j1", "j2"])
+
+        for i in range(len(categorias_csv)):
+            valor_j1 = lista_puntaje[0][i]
+            valor_j2 = lista_puntaje[1][i]
+
+            if valor_j1 is None:
+                valor_j1 = ""
+            if valor_j2 is None:
+                valor_j2 = ""
+
+            writer.writerow([categorias_csv[i], valor_j1, valor_j2])
+
+
+def crear_archivo_jugadas(lista_puntaje):
+    guardar_tabla_csv(lista_puntaje)
+
+
+def tirar1dado():
+    return random.randint(1, 6)
+
+
+def es_generala(lista_dados):
+    dados_ordenados = sorted(lista_dados)
+    return dados_ordenados[0] == dados_ordenados[1] == dados_ordenados[2] == dados_ordenados[3] == dados_ordenados[4]
+
 
 def tirar_dados():
-    tirada_counter=1
-    dado1= random.randint(1,6)
-    dado2= random.randint(1,6)
-    dado3= random.randint(1,6)
-    dado4= random.randint(1,6)
-    dado5= random.randint(1,6)
-    lista_dados=[dado1, dado2, dado3, dado4, dado5]
-    print (f'Dado 0: {lista_dados[0]}, Dado 1: {lista_dados[1]}, Dado 2: {lista_dados[2]}, Dado 3: {lista_dados[3]}, Dado 4: {lista_dados[4]}')
-    valido=False
+    tirada_counter = 1
+
+    lista_dados = [
+        random.randint(1, 6),
+        random.randint(1, 6),
+        random.randint(1, 6),
+        random.randint(1, 6),
+        random.randint(1, 6)
+    ]
+
+    primera_tirada = lista_dados[:]
+
+    print(f'Dado 0: {lista_dados[0]}, Dado 1: {lista_dados[1]}, Dado 2: {lista_dados[2]}, Dado 3: {lista_dados[3]}, Dado 4: {lista_dados[4]}')
+
+    valido = False
     while not valido:
-        tirar_again=input ('Desea tirar los dados de nuevo? (V o F): ')
-        if tirar_again=='V' or tirar_again=='F':
-            valido=True
-        else: 
-            print('ingrese V o F')
-    while tirada_counter<3 and tirar_again=='V':
-        valido=False
+        tirar_again = input('Desea tirar los dados de nuevo? (V o F): ').upper()
+        if tirar_again == 'V' or tirar_again == 'F':
+            valido = True
+        else:
+            print('Ingrese V o F')
+
+    planto_primera_tirada = False
+    generala_real = False
+
+    if tirar_again == 'F':
+        planto_primera_tirada = True
+        if es_generala(lista_dados):
+            generala_real = True
+        return lista_dados, planto_primera_tirada, generala_real
+
+    while tirada_counter < 3 and tirar_again == 'V':
+        valido = False
         while not valido:
             try:
-                intentos=int(input('Cuantos dados quiere volver a tirar?: ')) 
-                if intentos<=5:
-                    valido=True
+                intentos = int(input('Cuantos dados quiere volver a tirar?: '))
+                if 0 <= intentos <= 5:
+                    valido = True
                 else:
-                    print('ingrese un numero valido')
-            except:
-                print('ingrese un numero valido') 
-        i=1
-        while i<=intentos:
-            valido=False
+                    print('Ingrese un numero valido')
+            except ValueError:
+                print('Ingrese un numero valido')
+
+        if intentos == 0 and tirada_counter == 1:
+            planto_primera_tirada = True
+            if es_generala(lista_dados):
+                generala_real = True
+            return lista_dados, planto_primera_tirada, generala_real
+
+        dados_ya_elegidos = []
+
+        i = 1
+        while i <= intentos:
+            valido = False
             while not valido:
                 try:
-                    dado_a_tirar=int(input ('Cual dado quiere volver a tirar?: ')) 
-                    if dado_a_tirar==0 or dado_a_tirar==1 or dado_a_tirar==2 or dado_a_tirar==3 or dado_a_tirar==4:
-                        valido=True
+                    dado_a_tirar = int(input('Cual dado quiere volver a tirar?: '))
+                    if dado_a_tirar in [0, 1, 2, 3, 4]:
+                        if dado_a_tirar not in dados_ya_elegidos:
+                            valido = True
+                        else:
+                            print('Ese dado ya fue elegido en esta tirada')
                     else:
-                        print('ingrese un numero valido')
-                except:
-                    print('ingrese un numero valido') 
-            lista_dados[dado_a_tirar]=tirar1dado()
-            i+=1
-        print (f'Dado 0: {lista_dados[0]}, Dado 1: {lista_dados[1]}, Dado 2: {lista_dados[2]}, Dado 3: {lista_dados[3]}, Dado 4: {lista_dados[4]}')
-        tirada_counter+=1
-        if tirada_counter<3:
-            tirar_again=input ('Desea tirar los dados de nuevo? (V o F): ')
-    return (lista_dados)
+                        print('Ingrese un numero valido')
+                except ValueError:
+                    print('Ingrese un numero valido')
 
-def categorias (lista_dados):
-    lista_puntajes=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    sorted(lista_dados)             
-    lista_categorias=['E', 'F', 'P', 'G', '1', '2', '3', '4', '5', '6']
-    print(lista_categorias)
-    cat_elegida=input('Que categoría elige para sus dados?: ')
-    
-    while cat_elegida not in lista_categorias:
-        cat_elegida=input('Eso no es una categoria. Que categoría elige para sus dados?: ')
-    
-    if cat_elegida=='E':
-        puntaje_escalera=0
-        is_escalera=True
-        for i in range(len(lista_dados)-1):
-            if lista_dados[i]+1!=lista_dados[i+1]:
-                is_escalera=False
-        if not is_escalera:
-            print ('Sus dados no califican para entrar a ESCALERA.')
+            dados_ya_elegidos.append(dado_a_tirar)
+            lista_dados[dado_a_tirar] = tirar1dado()
+            i += 1
+
+        print(f'Dado 0: {lista_dados[0]}, Dado 1: {lista_dados[1]}, Dado 2: {lista_dados[2]}, Dado 3: {lista_dados[3]}, Dado 4: {lista_dados[4]}')
+
+        tirada_counter += 1
+
+        if tirada_counter < 3:
+            valido = False
+            while not valido:
+                tirar_again = input('Desea tirar los dados de nuevo? (V o F): ').upper()
+                if tirar_again == 'V' or tirar_again == 'F':
+                    valido = True
+                else:
+                    print('Ingrese V o F')
+
+    return lista_dados, planto_primera_tirada, generala_real
+
+
+def pedir_categoria_disponible(jugador, lista_puntaje):
+    lista_categorias = ['E', 'F', 'P', 'G', '1', '2', '3', '4', '5', '6']
+    disponibles = []
+
+    for i in range(len(lista_categorias)):
+        if lista_puntaje[jugador][i] is None:
+            disponibles.append(lista_categorias[i])
+
+    print("Categorias disponibles:", disponibles)
+
+    cat_elegida = input('Que categoría elige para sus dados?: ').upper()
+    while cat_elegida not in disponibles:
+        cat_elegida = input('Esa categoria no esta disponible. Que categoría elige?: ').upper()
+
+    return cat_elegida
+
+
+def pedir_categoria_de_lista(lista_categorias_validas):
+    print("Categorias validas disponibles:", lista_categorias_validas)
+
+    cat_elegida = input('Debe elegir una categoria valida: ').upper()
+    while cat_elegida not in lista_categorias_validas:
+        cat_elegida = input('Esa categoria no es valida. Debe elegir una categoria valida: ').upper()
+
+    return cat_elegida
+
+
+def pedir_categoria_para_cero(jugador, lista_puntaje):
+    lista_categorias = ['E', 'F', 'P', 'G', '1', '2', '3', '4', '5', '6']
+    disponibles = []
+
+    for i in range(len(lista_categorias)):
+        if lista_puntaje[jugador][i] is None:
+            disponibles.append(lista_categorias[i])
+
+    print("No hay jugadas validas disponibles.")
+    print("Debe elegir una categoria pendiente para anotarse 0.")
+    print("Categorias pendientes:", disponibles)
+
+    cat_elegida = input('Que categoría elige para anotarse 0?: ').upper()
+    while cat_elegida not in disponibles:
+        cat_elegida = input('Esa categoria no esta disponible. Que categoría elige?: ').upper()
+
+    return cat_elegida
+
+
+def obtener_indice_categoria(cat_elegida):
+    if cat_elegida == 'E':
+        return 0
+    elif cat_elegida == 'F':
+        return 1
+    elif cat_elegida == 'P':
+        return 2
+    elif cat_elegida == 'G':
+        return 3
+    elif cat_elegida == '1':
+        return 4
+    elif cat_elegida == '2':
+        return 5
+    elif cat_elegida == '3':
+        return 6
+    elif cat_elegida == '4':
+        return 7
+    elif cat_elegida == '5':
+        return 8
+    else:
+        return 9
+
+
+def calcular_puntaje_categoria(lista_dados, cat_elegida, planto_primera_tirada):
+    dados = sorted(lista_dados)
+    puntaje = 0
+    entra = False
+
+    if cat_elegida == 'E':
+        if dados == [1, 2, 3, 4, 5] or dados == [2, 3, 4, 5, 6]:
+            puntaje = 20
+            if planto_primera_tirada:
+                puntaje += 5
+            entra = True
+
+    elif cat_elegida == 'F':
+        if ((dados[0] == dados[1] == dados[2] and dados[3] == dados[4]) or
+            (dados[0] == dados[1] and dados[2] == dados[3] == dados[4])):
+            puntaje = 30
+            if planto_primera_tirada:
+                puntaje += 5
+            entra = True
+
+    elif cat_elegida == 'P':
+        if (dados[0] == dados[1] == dados[2] == dados[3] or
+            dados[1] == dados[2] == dados[3] == dados[4]):
+            puntaje = 40
+            if planto_primera_tirada:
+                puntaje += 5
+            entra = True
+
+    elif cat_elegida == 'G':
+        if dados[0] == dados[1] == dados[2] == dados[3] == dados[4]:
+            puntaje = 50
+            entra = True
+
+    elif cat_elegida == '1':
+        for elem in dados:
+            if elem == 1:
+                puntaje += 1
+        if puntaje > 0:
+            entra = True
+
+    elif cat_elegida == '2':
+        for elem in dados:
+            if elem == 2:
+                puntaje += 2
+        if puntaje > 0:
+            entra = True
+
+    elif cat_elegida == '3':
+        for elem in dados:
+            if elem == 3:
+                puntaje += 3
+        if puntaje > 0:
+            entra = True
+
+    elif cat_elegida == '4':
+        for elem in dados:
+            if elem == 4:
+                puntaje += 4
+        if puntaje > 0:
+            entra = True
+
+    elif cat_elegida == '5':
+        for elem in dados:
+            if elem == 5:
+                puntaje += 5
+        if puntaje > 0:
+            entra = True
+
+    elif cat_elegida == '6':
+        for elem in dados:
+            if elem == 6:
+                puntaje += 6
+        if puntaje > 0:
+            entra = True
+
+    return puntaje, entra
+
+
+def obtener_categorias_validas(lista_dados, jugador, lista_puntaje, planto_primera_tirada):
+    lista_categorias = ['E', 'F', 'P', 'G', '1', '2', '3', '4', '5', '6']
+    categorias_validas = []
+
+    for i in range(len(lista_categorias)):
+        if lista_puntaje[jugador][i] is None:
+            puntaje, entra = calcular_puntaje_categoria(lista_dados, lista_categorias[i], planto_primera_tirada)
+            if entra:
+                categorias_validas.append(lista_categorias[i])
+
+    return categorias_validas
+
+
+def categorias(lista_dados, jugador, lista_puntaje, planto_primera_tirada):
+    categorias_validas = obtener_categorias_validas(lista_dados, jugador, lista_puntaje, planto_primera_tirada)
+
+    if len(categorias_validas) == 0:
+        categoria_cero = pedir_categoria_para_cero(jugador, lista_puntaje)
+        indice_cero = obtener_indice_categoria(categoria_cero)
+        lista_puntaje[jugador][indice_cero] = 0
+        print(f'Se anotaron 0 puntos en la categoria {categoria_cero}.')
+        guardar_tabla_csv(lista_puntaje)
+        return lista_puntaje
+
+    cat_elegida = pedir_categoria_disponible(jugador, lista_puntaje)
+    puntaje, entra = calcular_puntaje_categoria(lista_dados, cat_elegida, planto_primera_tirada)
+
+    while not entra:
+        print(f'Sus dados no califican para entrar a {cat_elegida}.')
+        print('Debe elegir una categoria valida entre las disponibles para esta jugada.')
+        cat_elegida = pedir_categoria_de_lista(categorias_validas)
+        puntaje, entra = calcular_puntaje_categoria(lista_dados, cat_elegida, planto_primera_tirada)
+
+    indice = obtener_indice_categoria(cat_elegida)
+    lista_puntaje[jugador][indice] = puntaje
+    print(f'La jugada entra en la categoria {cat_elegida}. Puntaje obtenido: {puntaje}')
+
+    guardar_tabla_csv(lista_puntaje)
+    return lista_puntaje
+
+
+def mostrar_puntajes(lista_puntaje):
+    categorias_nombres = ['E', 'F', 'P', 'G', '1', '2', '3', '4', '5', '6']
+
+    print('\nPUNTAJES:')
+    print('      ', end='')
+    for categoria in categorias_nombres:
+        print(f'{categoria:>4}', end='')
+    print()
+
+    print('J1 -> ', end='')
+    for valor in lista_puntaje[0]:
+        if valor is None:
+            print(f'{"-":>4}', end='')
         else:
-            puntaje_escalera+=20
-            lista_puntajes[0]=puntaje_escalera
-    
-    if cat_elegida=='F':
-        puntaje_full=0
-        is_full=True
-        if not ((lista_dados[0]==lista_dados[1]==lista_dados[2] and lista_dados[3]==lista_dados[4]) or (lista_dados[0]==lista_dados[1] and lista_dados[2]==lista_dados[3]==lista_dados[4])):
-            is_full=False
-        if not is_full:
-            print ('Sus dados no califican para entrar a FULL.')
+            print(f'{valor:>4}', end='')
+    print()
+
+    print('J2 -> ', end='')
+    for valor in lista_puntaje[1]:
+        if valor is None:
+            print(f'{"-":>4}', end='')
         else:
-            puntaje_full+=30
-            lista_puntajes[1]=puntaje_full
-
-    if cat_elegida=='P':
-        puntaje_poker=0
-        is_poker=True
-        if not (lista_dados[0]==lista_dados[1]==lista_dados[2]==lista_dados[3] or lista_dados[1]==lista_dados[2]==lista_dados[3]==lista_dados[4]):
-            is_poker=False
-        if not is_poker:
-            print ('Sus dados no califican para entrar a POKER.')
-        else:
-            puntaje_poker+=40
-            lista_puntajes[2]=puntaje_poker
-    
-    if cat_elegida=='G':
-        puntaje_generala=0
-        is_generala=True
-        if not (lista_dados[0]==lista_dados[1]==lista_dados[2]==lista_dados[3]==lista_dados[4]):
-            is_generala=False
-        if not is_generala:
-            print ('Sus dados no califican para entrar a GENERALA.')
-        else:
-            puntaje_generala+=50
-            lista_puntajes[3]=puntaje_generala
-    
-    if cat_elegida=='6':
-        puntaje_seis=0
-        is_seis=True
-        for elem in lista_dados:
-            if elem==6:
-                puntaje_seis+=elem
-        if puntaje_seis==0:
-            print ('Sus dados no califican para entrar a SEIS.')
-            is_seis=False
-        if is_seis:
-            lista_puntajes[9]=puntaje_seis
-
-    if cat_elegida=='5':
-        puntaje_cinco=0
-        is_cinco=True
-        for elem in lista_dados:
-            if elem==5:
-                puntaje_cinco+=elem
-        if puntaje_cinco==0:
-            print ('Sus dados no califican para entrar a CINCO.')
-            is_cinco=False
-        if is_cinco:
-            lista_puntajes[8]=puntaje_cinco
-    
-    if cat_elegida=='4':
-        puntaje_cuatro=0
-        is_cuatro=True
-        for elem in lista_dados:
-            if elem==4:
-                puntaje_cuatro+=elem
-        if puntaje_cuatro==0:
-            print ('Sus dados no califican para entrar a CUATRO.')
-            is_cuatro=False
-        if is_cuatro:
-            lista_puntajes[7]=puntaje_cuatro
-
-    if cat_elegida=='3':
-        puntaje_tres=0
-        is_tres=True
-        for elem in lista_dados:
-            if elem==3:
-                puntaje_tres+=elem
-        if puntaje_tres==0:
-            print ('Sus dados no califican para entrar a TRES.')
-            is_tres=False
-        if is_tres:
-            lista_puntajes[6]=puntaje_tres
-
-    if cat_elegida=='2':
-        puntaje_dos=0
-        is_dos=True
-        for elem in lista_dados:
-            if elem==2:
-                puntaje_dos+=elem
-        if puntaje_dos==0:
-            print ('Sus dados no califican para entrar a DOS.')
-            is_dos=False
-        if is_dos:
-            lista_puntajes[5]=puntaje_dos
-    
-    if cat_elegida=='1':
-        puntaje_uno=0
-        is_uno=True
-        for elem in lista_dados:
-            if elem==1:
-                puntaje_uno+=elem
-        if puntaje_uno==0:
-            print ('Sus dados no califican para entrar a UNO.')
-            is_uno=False
-        if is_uno:
-            lista_puntajes[4]=puntaje_uno
-            
-    
-    
-def escribir_csv(lista):  
-    with open('jugadas.csv', 'a', newline='', encoding='utf-8') as archivo:
-        escritor = csv.writer(archivo)
-        escritor.writerow(lista)
-    
+            print(f'{valor:>4}', end='')
+    print()
 
 
-    
-
-
-        
-    
-
+def calcular_total(puntajes_jugador):
+    total = 0
+    for valor in puntajes_jugador:
+        if valor is not None:
+            total += valor
+    return total
 
 def main():
-    # Aqui ejecutas tus soluciones
-    print(tirar_dados())
+    lista_puntaje = [
+        [None, None, None, None, None, None, None, None, None, None],
+        [None, None, None, None, None, None, None, None, None, None]
+    ]
+
+    crear_archivo_jugadas(lista_puntaje)
+
+    ganador_generala_real = None
+
+    for ronda in range(10):
+        print(f'\n----- RONDA {ronda + 1} -----')
+
+        for jugador in range(2):
+            print(f'\nTurno del jugador {jugador + 1}')
+
+            lista_dados, planto_primera_tirada, generala_real = tirar_dados()
+
+            if generala_real:
+                indice_g = obtener_indice_categoria('G')
+                lista_puntaje[jugador][indice_g] = 80
+                guardar_tabla_csv(lista_puntaje)
+
+                ganador_generala_real = jugador + 1
+                print(f'\nGENERALA REAL del jugador {jugador + 1}.')
+                print(f'Se anotan 80 puntos en G y el jugador {jugador + 1} gana inmediatamente.')
+                break
+
+            lista_puntaje = categorias(lista_dados, jugador, lista_puntaje, planto_primera_tirada)
+            mostrar_puntajes(lista_puntaje)
+
+        if ganador_generala_real is not None:
+            break
+
+    if ganador_generala_real is None:
+        print('\nJuego terminado.')
+        print('\nPUNTAJES FINALES:')
+        mostrar_puntajes(lista_puntaje)
+
+        total_j1 = calcular_total(lista_puntaje[0])
+        total_j2 = calcular_total(lista_puntaje[1])
+
+        print(f'\nTotal jugador 1: {total_j1}')
+        print(f'Total jugador 2: {total_j2}')
+
+        if total_j1 > total_j2:
+            print('Gana el jugador 1')
+        elif total_j2 > total_j1:
+            print('Gana el jugador 2')
+        else:
+            print('Empate')
 
 
 # No cambiar a partir de aqui
